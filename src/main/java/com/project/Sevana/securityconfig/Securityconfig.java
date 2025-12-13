@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -19,7 +20,8 @@ public class Securityconfig {
 	@Bean
 	public SecurityFilterChain securityfilterchain(HttpSecurity http) throws Exception{
 		http.csrf(csrf->csrf.disable());
-		http.authorizeHttpRequests(requests->requests.anyRequest().authenticated());
+		http.authorizeHttpRequests(requests->requests.requestMatchers("/users/register/**").
+				permitAll().anyRequest().authenticated());
 		http.httpBasic(Customizer.withDefaults());
 		http.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		return http.build();
@@ -37,7 +39,7 @@ public class Securityconfig {
 	@Bean
 	public AuthenticationProvider authentication() {
 		DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userdetailsservice);
-		provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+		provider.setPasswordEncoder(new BCryptPasswordEncoder(12));// this to convert login request password into hash and compare it with db password
 		return provider;
 	}
 }
