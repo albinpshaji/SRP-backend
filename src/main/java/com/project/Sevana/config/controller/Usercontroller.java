@@ -3,6 +3,7 @@ package com.project.Sevana.config.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,8 @@ public class Usercontroller {
 	public Usercontroller(Userservice service) {
 		this.service=service;
 	}
+	
+	
 	@GetMapping("/")
 	public List<Users> getusers() {
 		return service.getusers();
@@ -30,6 +33,12 @@ public class Usercontroller {
 	@PostMapping("/register")
 	public Users registeruser(@RequestBody Users user) {
 		return service.registeruser(user);
+	}
+	
+	@PostMapping("/login")
+	public String login(@RequestBody Users user) {
+		return service.verify(user);
+		
 	}
 	
 }
