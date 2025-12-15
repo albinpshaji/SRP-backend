@@ -13,12 +13,24 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.project.Sevana.securityFilter.Jwtfilter;
 
 @Configuration
 @EnableWebSecurity
 public class Securityconfig {
+
+	private final UserDetailsService userdetailsservice;
+	private final Jwtfilter jwtfilter;
+	
+	@Autowired
+	public Securityconfig(UserDetailsService userdetailsservice,Jwtfilter jwtfilter) {
+		this.userdetailsservice=userdetailsservice;
+		this.jwtfilter=jwtfilter;
+	}
+	
 	@Bean
 	public SecurityFilterChain securityfilterchain(HttpSecurity http) throws Exception{
 		http.csrf(csrf->csrf.disable());
@@ -26,16 +38,12 @@ public class Securityconfig {
 				permitAll().anyRequest().authenticated());
 		http.httpBasic(Customizer.withDefaults());
 		http.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+		http.addFilterBefore(jwtfilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 		
 	}
 	
-	private UserDetailsService userdetailsservice;
 	
-	@Autowired
-	public Securityconfig(UserDetailsService userdetailsservice) {
-		this.userdetailsservice=userdetailsservice;
-	}
 	
 	//used for authentication from database
 	@Bean

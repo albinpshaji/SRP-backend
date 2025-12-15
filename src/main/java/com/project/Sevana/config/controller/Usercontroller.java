@@ -17,7 +17,7 @@ import com.project.Sevana.service.Userservice;
 @RequestMapping("/users")
 public class Usercontroller {
 	
-	private Userservice service;
+	private final Userservice service;
 	
 	@Autowired
 	public Usercontroller(Userservice service) {
