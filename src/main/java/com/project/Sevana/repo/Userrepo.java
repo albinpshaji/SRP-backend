@@ -7,5 +7,7 @@ import com.project.Sevana.model.Users;
 
 @Repository
 public interface Userrepo extends JpaRepository<Users,Long>{
+
+	Users findByUsername(String username);
 	
 }
