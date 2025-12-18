@@ -31,10 +31,10 @@ public class Donationservice {
 		donation.setTitle(data.getTitle());
 		donation.setCategory(data.getCategory());
 		donation.setDescription(data.getDescription());
-		donation.setPickuplocation(data.getPickuplocation());
+		donation.setPickupLocation(data.getPickuplocation());
 		donation.setStatus(data.getStatus());
-		donation.setUserid(donor);
-		donation.setRecepient(recepient);
+		donation.setDonor(donor);
+		donation.setRecipient(recepient);
 		donrepo.save(donation);
 		return "success";
 	}
@@ -42,6 +42,10 @@ public class Donationservice {
 	public List<Users> showallngos(String role) {
 		
 		return userrepo.findByRole(role);
+	}
+
+	public List<Donations> getmydonations(Long id) {
+		return donrepo.findByDonorUserid(id);
 	}
 
 }

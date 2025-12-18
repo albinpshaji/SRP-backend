@@ -1,5 +1,8 @@
 package com.project.Sevana.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +27,7 @@ public class Users {
 	@Column(unique = true, nullable =false)
 	private String username;
 	
+	@JsonProperty(access=JsonProperty.Access.WRITE_ONLY)//so that password is not send to frontend
 	@Column(nullable = false)
 	private String password;
 	

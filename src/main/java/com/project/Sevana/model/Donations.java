@@ -30,13 +30,13 @@ public class Donations {
 	
 	private String category;
 	
-	private String pickuplocation;
+	private String pickupLocation;
 	
 	@ManyToOne
 	@JoinColumn(name="donor_id")
-	private Users userid;
+	private Users donor;
 	
 	@ManyToOne
 	@JoinColumn(name="recipient_id")
-	private Users recepient;
+	private Users recipient;
 }

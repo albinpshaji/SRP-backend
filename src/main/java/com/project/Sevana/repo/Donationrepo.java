@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 import com.project.Sevana.model.Donations;
 @Repository
 public interface Donationrepo extends JpaRepository<Donations,Long>{
-	List<Donations> findByUserid(Long userid);
+	List<Donations> findByDonorUserid(Long userid);
 }
