@@ -39,7 +39,14 @@ public class Jwtfilter extends OncePerRequestFilter{//onece per request means me
 		
 		if(authHeader!=null && authHeader.startsWith("Bearer ")) {//removes the bearer from the request token for verification
 			token = authHeader.substring(7);
-			username = jwtservice.extractusername(token);
+			try {
+                //trying to read the token
+                username = jwtservice.extractusername(token);
+            } catch (Exception e) {
+                // If the token is expired or invalid, prints a small log
+                // BUT we do NOT stop the request. We just leave 'username' as null.
+                System.out.println("Token validation failed: " + e.getMessage());
+            }
 		}
 		
 		if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null) {// checks if user exists and it is not authenticated already

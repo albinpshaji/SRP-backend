@@ -10,6 +10,7 @@ import java.util.function.Function;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -19,16 +20,10 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 @Service
 public class Jwtservice {
-
+	
+	@Value("${jwt.secret}")
 	private String secretkey;
 	public Jwtservice() {
-		try {
-			KeyGenerator keygen = KeyGenerator.getInstance("HmacSHA256");
-			SecretKey sk = keygen.generateKey();
-			secretkey = Base64.getEncoder().encodeToString(sk.getEncoded());
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
 		
 	}
 	public String generatetoken(String username) {
@@ -38,7 +33,7 @@ public class Jwtservice {
 				   .add(claims)
 				   .subject(username)
 				   .issuedAt(new Date(System.currentTimeMillis()))
-				   .expiration(new Date(System.currentTimeMillis()+1000*60*60))//1hour
+				   .expiration(new Date(System.currentTimeMillis()+1000*60))//1hour
 				   .and()
 				   .signWith(getKey())
 				   .compact();
