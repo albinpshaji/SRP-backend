@@ -5,13 +5,8 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.project.Sevana.model.Users;
-
+import com.project.Sevana.model.Donations;
 @Repository
-public interface Userrepo extends JpaRepository<Users,Long>{
-
-	Users findByUsername(String username);
-	
-	List<Users> findByRole(String role);
-	
+public interface Donationrepo extends JpaRepository<Donations,Long>{
+	List<Donations> findByDonorUserid(Long userid);
 }
