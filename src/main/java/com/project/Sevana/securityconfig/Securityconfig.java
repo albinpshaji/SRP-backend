@@ -1,5 +1,7 @@
 package com.project.Sevana.securityconfig;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +17,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.project.Sevana.securityFilter.Jwtfilter;
 
@@ -34,7 +39,8 @@ public class Securityconfig {
 	@Bean
 	public SecurityFilterChain securityfilterchain(HttpSecurity http) throws Exception{
 		http.csrf(csrf->csrf.disable());
-		http.authorizeHttpRequests(requests->requests.requestMatchers("/users/register/**","/users/login/**").
+		http.cors(Customizer.withDefaults());
+		http.authorizeHttpRequests(requests->requests.requestMatchers("/register/**","/login/**").
 				permitAll().anyRequest().authenticated());
 		http.httpBasic(Customizer.withDefaults());
 		http.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -43,7 +49,17 @@ public class Securityconfig {
 		
 	}
 	
-	
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration confi = new CorsConfiguration();
+		confi.setAllowedOrigins(List.of("http://localhost:5173"));
+		confi.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		confi.setAllowedHeaders(List.of("Authorization","Content-Type"));
+		confi.setAllowCredentials(true);
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", confi);
+		return source;
+	}
 	
 	//used for authentication from database
 	@Bean
@@ -54,7 +70,7 @@ public class Securityconfig {
 	}
 	
 	@Bean
-	public AuthenticationManager Authmag(AuthenticationConfiguration config) {
+	public AuthenticationManager Authmag(AuthenticationConfiguration config) throws Exception{
 		return config.getAuthenticationManager();
 	}
 }
