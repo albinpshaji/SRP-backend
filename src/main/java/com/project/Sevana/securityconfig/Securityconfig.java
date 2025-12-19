@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,6 +26,7 @@ import com.project.Sevana.securityFilter.Jwtfilter;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity//this is to enable @PreAuthorize annotation so you can lock specific requests from specific users
 public class Securityconfig {
 
 	private final UserDetailsService userdetailsservice;
