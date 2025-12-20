@@ -36,6 +36,8 @@ public class Donationservice {
 			return "Error:you are not logged in properly";
 		if(recepient==null)
 			return "Error:ngo selected not exists";
+		if(!recepient.getRole().equals("NGO"))
+			return "This is not a ngo";
 		Donations donation = new Donations();
 		donation.setTitle(data.getTitle());
 		donation.setCategory(data.getCategory());
