@@ -9,4 +9,5 @@ import com.project.Sevana.model.Donations;
 @Repository
 public interface Donationrepo extends JpaRepository<Donations,Long>{
 	List<Donations> findByDonorUserid(Long userid);
+	List<Donations> findByRecipientUsername(String username);
 }

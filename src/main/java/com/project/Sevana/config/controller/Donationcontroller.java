@@ -3,6 +3,7 @@ package com.project.Sevana.config.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,18 +24,27 @@ public class Donationcontroller {
 	}
 	
 	@GetMapping("/ngos")
+	@PreAuthorize("hasAnyAuthority('ADMIN','DONOR')")
 	public List<Users> showallngos(){
 		return service.showallngos("NGO");
 	}
 	
 	@PostMapping("/ngos/donate")
+	@PreAuthorize("hasAuthority('DONOR')")
 	public String givedirectdonation(@RequestBody DonationDTO data) {
 		return service.givedirectdonation(data);
 	}
 	
 	@GetMapping("/donations/{id}")
-	public List<Donations> getmydonations(@PathVariable Long id){
-		return service.getmydonations(id);
+	@PreAuthorize("hasAuthority('DONOR')")
+	public List<Donations> getmydonations(){
+		return service.getmydonations();
+	}
+	
+	@GetMapping("/incomingdonations")
+	@PreAuthorize("hasAuthority('NGO')")
+	public List<Donations> getincomingdonations(){
+		return service.getincomingdonations();
 	}
 	
 }

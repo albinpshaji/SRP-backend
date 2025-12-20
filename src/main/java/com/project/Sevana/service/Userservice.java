@@ -42,4 +42,8 @@ public class Userservice {
 		return "fail";
 	}
 
+	public Users findbyusername(String username) {
+		return repo.findByUsername(username);
+	}
+
 }

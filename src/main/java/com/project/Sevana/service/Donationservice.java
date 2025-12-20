@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.project.Sevana.DTO.DonationDTO;
@@ -22,11 +23,21 @@ public class Donationservice {
 		this.userrepo=userrepo;
 	}
 	
+	//to get the authenticateduser from jwtitself(stored in memory) used so that a user cant impersonate as an another person
+	private Users getAuthenticatedUser() {
+		String username= SecurityContextHolder.getContext().getAuthentication().getName();
+		return userrepo.findByUsername(username);
+	}
+	
 	public String givedirectdonation(DonationDTO data) {
-		Users donor = userrepo.findByUsername(data.getUsername());
+		Users donor = getAuthenticatedUser();
 		Users recepient = userrepo.findById(data.getRecepientid()).orElse(null);
-		if(donor==null || recepient==null)
-			return "Error:donor or recepient not found";
+		if(donor==null)
+			return "Error:you are not logged in properly";
+		if(recepient==null)
+			return "Error:ngo selected not exists";
+		if(!recepient.getRole().equals("NGO"))
+			return "This is not a ngo";
 		Donations donation = new Donations();
 		donation.setTitle(data.getTitle());
 		donation.setCategory(data.getCategory());
@@ -40,12 +51,17 @@ public class Donationservice {
 	}
 
 	public List<Users> showallngos(String role) {
-		
 		return userrepo.findByRole(role);
 	}
 
-	public List<Donations> getmydonations(Long id) {
-		return donrepo.findByDonorUserid(id);
+	public List<Donations> getmydonations() {
+		Long uid = getAuthenticatedUser().getUserid();
+		return donrepo.findByDonorUserid(uid);
+	}
+
+	public List<Donations> getincomingdonations() {
+		String username = getAuthenticatedUser().getUsername();
+		return donrepo.findByRecipientUsername(username);
 	}
 
 }

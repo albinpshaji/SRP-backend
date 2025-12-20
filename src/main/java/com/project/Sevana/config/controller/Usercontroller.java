@@ -3,11 +3,8 @@ package com.project.Sevana.config.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.Sevana.model.Users;
@@ -25,6 +22,7 @@ public class Usercontroller {
 	
 	
 	@GetMapping("/users")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public List<Users> getusers() {
 		return service.getusers();
 	}

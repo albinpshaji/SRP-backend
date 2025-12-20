@@ -11,14 +11,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class UserPrincipal implements UserDetails {
 	
 	private Users user;
-	public UserPrincipal(Users user) {
+	public UserPrincipal(Users user) {//gets user details from myuserdetailsservice
 		this.user = user;
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		
-		return Collections.singleton(new SimpleGrantedAuthority("USER"));
+		return Collections.singleton(new SimpleGrantedAuthority(user.getRole().toUpperCase()));//to get the role for authentication
 	}
 
 	@Override
