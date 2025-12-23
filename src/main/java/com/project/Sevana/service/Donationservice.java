@@ -43,7 +43,7 @@ public class Donationservice {
 		donation.setCategory(data.getCategory());
 		donation.setDescription(data.getDescription());
 		donation.setPickupLocation(data.getPickuplocation());
-		donation.setStatus(data.getStatus());
+		donation.setStatus("PENDING");
 		donation.setDonor(donor);
 		donation.setRecipient(recepient);
 		donrepo.save(donation);
@@ -64,4 +64,21 @@ public class Donationservice {
 		return donrepo.findByRecipientUsername(username);
 	}
 
+	public String acceptdonations(Long id,String status) {
+		Long nid = getAuthenticatedUser().getUserid();
+		Donations dono = donrepo.getCorrectNgo(id,nid);
+		
+		if(dono==null) {
+			return"retry";
+		}
+		
+		try {
+			donrepo.updatestatus(id,status);
+			return "success";
+		}
+		catch(Exception e) {
+			return "failure"+e;
+		}
+	}
+	
 }
