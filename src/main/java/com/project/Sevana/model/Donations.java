@@ -28,6 +28,8 @@ public class Donations {
 	
 	private String status;
 	
+	private String logistics = "DROPOF";
+	
 	private String category;
 	
 	private String pickupLocation;

@@ -38,4 +38,6 @@ public class Users {
 	private String phone;
 	
 	private String location;
+	
+	private Boolean isverified=false;
 }
