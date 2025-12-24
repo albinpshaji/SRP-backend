@@ -28,7 +28,7 @@ public class Admincontroller {
 		return service.verifyuser(id,isverify);
 	}
 	
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("/delete/{did}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public String deleteuser(@PathVariable Long did) {
 		return service.deleteuser(did);
