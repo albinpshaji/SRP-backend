@@ -2,7 +2,7 @@ package com.project.Sevana.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.project.Sevana.model.Users;
 import com.project.Sevana.repo.Userrepo;
 
 @Service
@@ -32,6 +32,21 @@ public class Adminservice {
 				return "error"+e;
 			}
 		}
+	}
+	public String deleteuser(Long did) {
+		Users user=repo.findById(did).orElse(null);
+		if(user==null) {
+			return "user does not exist";
+		}
+		try {
+			repo.deleteById(did);
+			return "success";
+		}
+		catch(Exception e){
+			return "fail"+e;
+		}
+		
+		
 	}
 	
 }
