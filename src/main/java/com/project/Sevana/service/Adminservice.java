@@ -13,7 +13,7 @@ public class Adminservice {
 	public Adminservice(Userrepo repo) {
 		this.repo = repo;
 	}
-	public String verifyuser(Long id,Boolean isverify) {
+	public String verifyuser(Long id,Boolean isverify) {//when someone registers as ngo it is saved as NV_NGO as role,when it is verified it is turned to NGO
 		if(isverify) {
 			try {
 				repo.verifyuser(id,isverify);
