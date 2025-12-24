@@ -14,7 +14,7 @@ public class Adminservice {
 		this.repo = repo;
 	}
 	public String verifyuser(Long id,Boolean isverify) {//when someone registers as ngo it is saved as NV_NGO as role,when it is verified it is turned to NGO
-		if(isverify) {
+		if(isverify) {//if isverify is true it verifies the user, makes changes to the role
 			try {
 				repo.verifyuser(id,isverify);
 				return "verified";
@@ -25,7 +25,7 @@ public class Adminservice {
 		}
 		else {
 			try {
-				repo.rejectuser(id, isverify);
+				repo.rejectuser(id, isverify);//if isverify is false it rejects the user, makes changes to the role
 				return "rejected";
 			}
 			catch(Exception e) {
