@@ -46,7 +46,5 @@ public class Adminservice {
 			return "fail"+e;
 		}
 		
-		
-	}
-	
+	}	
 }
