@@ -44,6 +44,7 @@ public class Donationservice {
 		donation.setPickupLocation(data.getPickuplocation());
 		donation.setStatus("PENDING");
 		donation.setLogistics(data.getLogistics());
+		donation.setImageurl(data.getImageurl());
 		donation.setDonor(donor);
 		donation.setRecipient(recepient);
 		donrepo.save(donation);
