@@ -1,6 +1,5 @@
 package com.project.Sevana.DTO;
 
-import com.project.Sevana.model.Users;
 
 import lombok.Data;
 
