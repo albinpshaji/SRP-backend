@@ -41,4 +41,7 @@ public class Donations {
 	@ManyToOne
 	@JoinColumn(name="recipient_id")
 	private Users recipient;
+	
+	@Column(columnDefinition="TEXT")
+	private String imageurl;
 }
