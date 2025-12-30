@@ -51,7 +51,11 @@ public class Donationservice {
 		return "success";
 	}
 
-	public List<Users> showallngos(String role) {
+	public List<Users> showallngos(String role1,String role2) {
+		return userrepo.findByRoles(role1,role2);
+	}
+	
+	public List<Users> showngos(String role) {
 		return userrepo.findByRole(role);
 	}
 
@@ -81,5 +85,7 @@ public class Donationservice {
 			return "failure"+e;
 		}
 	}
+
+	
 	
 }
