@@ -24,10 +24,16 @@ public class Donationcontroller {
 		this.service=service;
 	}
 	
+	@GetMapping("/allngos")
+	@PreAuthorize("hasAnyAuthority('ADMIN')")
+	public List<Users> showallngos(){
+		return service.showallngos("NGO","NV_NGO");
+	}
+	
 	@GetMapping("/ngos")
 	@PreAuthorize("hasAnyAuthority('ADMIN','DONOR')")
-	public List<Users> showallngos(){
-		return service.showallngos("NGO");
+	public List<Users> showngos(){
+		return service.showngos("NGO");
 	}
 	
 	@PostMapping("/ngos/donate")

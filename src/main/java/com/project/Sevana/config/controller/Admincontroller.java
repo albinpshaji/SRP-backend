@@ -2,6 +2,7 @@ package com.project.Sevana.config.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,5 +26,11 @@ public class Admincontroller {
 	public String verifyuser(@PathVariable Long id,@RequestBody UserDTO data){//Uses the UserDTO here to get data from postman
 		Boolean isverify = data.getIsverified();
 		return service.verifyuser(id,isverify);
+	}
+	
+	@DeleteMapping("/delete/{did}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public String deleteuser(@PathVariable Long did) {
+		return service.deleteuser(did);
 	}
 }
