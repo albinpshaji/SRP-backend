@@ -17,6 +17,9 @@ public interface Userrepo extends JpaRepository<Users,Long>{
 	
 	List<Users> findByRole(String role);
 	
+	@Query(value="select * from users where role in(:role1,:role2)",nativeQuery=true)
+	List<Users> findByRoles(@Param("role1")String role1,@Param("role2")String role2);
+	
 	@Modifying
 	@Transactional
 	@Query(value="update users set isverified =:isverify,role ='NGO' where userid=:id",nativeQuery=true)
@@ -26,5 +29,6 @@ public interface Userrepo extends JpaRepository<Users,Long>{
 	@Transactional
 	@Query(value="update users set isverified =:isverify,role ='NV_NGO' where userid=:id",nativeQuery=true)
 	int rejectuser(@Param("id")Long id,@Param("isverify")Boolean isverify);
+	
 	
 }
