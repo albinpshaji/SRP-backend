@@ -44,13 +44,18 @@ public class Donationservice {
 		donation.setPickupLocation(data.getPickuplocation());
 		donation.setStatus("PENDING");
 		donation.setLogistics(data.getLogistics());
+		donation.setImageurl(data.getImageurl());
 		donation.setDonor(donor);
 		donation.setRecipient(recepient);
 		donrepo.save(donation);
 		return "success";
 	}
 
-	public List<Users> showallngos(String role) {
+	public List<Users> showallngos(String role1,String role2) {
+		return userrepo.findByRoles(role1,role2);
+	}
+	
+	public List<Users> showngos(String role) {
 		return userrepo.findByRole(role);
 	}
 
@@ -80,5 +85,7 @@ public class Donationservice {
 			return "failure"+e;
 		}
 	}
+
+	
 	
 }
