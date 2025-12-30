@@ -1,10 +1,11 @@
 package com.project.Sevana.config.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.project.Sevana.DTO.LoginresponseDTO;
 import com.project.Sevana.model.Users;
 import com.project.Sevana.service.Userservice;
 
@@ -23,8 +24,9 @@ public class AuthController {
 	}
 	
 	@PostMapping("/login")
-	public String login(@RequestBody Users user) {
-		return service.verify(user);
-		
+	public LoginresponseDTO login(@RequestBody Users user) {
+		String token = service.verify(user);
+		Users dbuser =service.findbyusername(user.getUsername());
+		return new LoginresponseDTO(token,dbuser.getRole(),dbuser.getUserid());
 	}
 }

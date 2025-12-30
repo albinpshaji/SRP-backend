@@ -3,9 +3,11 @@ package com.project.Sevana.config.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,19 +24,41 @@ public class Donationcontroller {
 		this.service=service;
 	}
 	
-	@GetMapping("/ngos")
+	@GetMapping("/allngos")
+	@PreAuthorize("hasAnyAuthority('ADMIN')")
 	public List<Users> showallngos(){
-		return service.showallngos("NGO");
+		return service.showallngos("NGO","NV_NGO");
+	}
+	
+	@GetMapping("/ngos")
+	@PreAuthorize("hasAnyAuthority('ADMIN','DONOR')")
+	public List<Users> showngos(){
+		return service.showngos("NGO");
 	}
 	
 	@PostMapping("/ngos/donate")
+	@PreAuthorize("hasAuthority('DONOR')")
 	public String givedirectdonation(@RequestBody DonationDTO data) {
 		return service.givedirectdonation(data);
 	}
 	
 	@GetMapping("/donations/{id}")
-	public List<Donations> getmydonations(@PathVariable Long id){
-		return service.getmydonations(id);
+	@PreAuthorize("hasAuthority('DONOR')")
+	public List<Donations> getmydonations(){
+		return service.getmydonations();
+	}
+	
+	@GetMapping("/incomingdonations")
+	@PreAuthorize("hasAuthority('NGO')")
+	public List<Donations> getincomingdonations(){
+		return service.getincomingdonations();
+	}
+	
+	@PutMapping("/incomingdonations/{id}")
+	@PreAuthorize("hasAuthority('NGO')")
+	public String acceptdonations(@PathVariable Long id,@RequestBody DonationDTO datastatus) {
+		String status = datastatus.getStatus();
+		return service.acceptdonations(id,status);
 	}
 	
 }
