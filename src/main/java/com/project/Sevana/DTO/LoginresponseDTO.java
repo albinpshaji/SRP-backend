@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class LoginresponseDTO {
+public class LoginresponseDTO{//used in authcontroller.java
 	private String token;
 	private String role;
 	private Long userid;

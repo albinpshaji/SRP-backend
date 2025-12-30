@@ -30,7 +30,11 @@ public class Userservice {
 	}
 
 	private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
-	public Users registeruser(Users user) {
+	public Users registeruser(Users user) {//when someone registers as ngo it is saved as NV_NGO as role,when it is verified it is turned to NGO
+		if(user.getRole().equals("NGO")) {
+			user.setRole("NV_NGO");//not verified ngo
+		}
+		user.setIsverified(false);
 		user.setPassword(encoder.encode(user.getPassword()));//encodes the password before saving into db
 		return repo.save(user);
 	}

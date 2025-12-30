@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,10 +24,16 @@ public class Donationcontroller {
 		this.service=service;
 	}
 	
+	@GetMapping("/allngos")
+	@PreAuthorize("hasAnyAuthority('ADMIN')")
+	public List<Users> showallngos(){
+		return service.showallngos("NGO","NV_NGO");
+	}
+	
 	@GetMapping("/ngos")
 	@PreAuthorize("hasAnyAuthority('ADMIN','DONOR')")
-	public List<Users> showallngos(){
-		return service.showallngos("NGO");
+	public List<Users> showngos(){
+		return service.showngos("NGO");
 	}
 	
 	@PostMapping("/ngos/donate")
@@ -45,6 +52,13 @@ public class Donationcontroller {
 	@PreAuthorize("hasAuthority('NGO')")
 	public List<Donations> getincomingdonations(){
 		return service.getincomingdonations();
+	}
+	
+	@PutMapping("/incomingdonations/{id}")
+	@PreAuthorize("hasAuthority('NGO')")
+	public String acceptdonations(@PathVariable Long id,@RequestBody DonationDTO datastatus) {
+		String status = datastatus.getStatus();
+		return service.acceptdonations(id,status);
 	}
 	
 }

@@ -1,7 +1,6 @@
 package com.project.Sevana.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,14 +42,20 @@ public class Donationservice {
 		donation.setCategory(data.getCategory());
 		donation.setDescription(data.getDescription());
 		donation.setPickupLocation(data.getPickuplocation());
-		donation.setStatus(data.getStatus());
+		donation.setStatus("PENDING");
+		donation.setLogistics(data.getLogistics());
+		donation.setImageurl(data.getImageurl());
 		donation.setDonor(donor);
 		donation.setRecipient(recepient);
 		donrepo.save(donation);
 		return "success";
 	}
 
-	public List<Users> showallngos(String role) {
+	public List<Users> showallngos(String role1,String role2) {
+		return userrepo.findByRoles(role1,role2);
+	}
+	
+	public List<Users> showngos(String role) {
 		return userrepo.findByRole(role);
 	}
 
@@ -64,4 +69,23 @@ public class Donationservice {
 		return donrepo.findByRecipientUsername(username);
 	}
 
+	public String acceptdonations(Long id,String status) {
+		Long nid = getAuthenticatedUser().getUserid();
+		Donations dono = donrepo.getCorrectNgo(id,nid);
+		
+		if(dono==null) {
+			return"retry";
+		}
+		
+		try {
+			donrepo.updatestatus(id,status);
+			return "success";
+		}
+		catch(Exception e) {
+			return "failure"+e;
+		}
+	}
+
+	
+	
 }
