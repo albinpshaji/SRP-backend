@@ -42,7 +42,7 @@ public class Donationcontroller {
 		return service.givedirectdonation(data);
 	}
 	
-	@GetMapping("/donations/{id}")
+	@GetMapping("/mydonations")
 	@PreAuthorize("hasAuthority('DONOR')")
 	public List<Donations> getmydonations(){
 		return service.getmydonations();
