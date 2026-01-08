@@ -15,7 +15,8 @@ public class Adminservice {
 	}
 	public String verifyuser(Long id,Boolean isverify) {//when someone registers as ngo it is saved as NV_NGO as role,when it is verified it is turned to NGO
 		Users ngos = repo.findById(id).orElse(null);
-		if(!ngos.getRole().equals("NV_NGO")) {
+		String role = ngos.getRole();
+		if(!(role.equals("NV_NGO") || role.equals("NGO"))) {
 			return "not a ngo";
 		}
 		
