@@ -24,7 +24,7 @@ public class Admincontroller {
 	@PostMapping("/verify/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public String verifyuser(@PathVariable Long id,@RequestBody UserDTO data){//Uses the UserDTO here to get data from postman
-		Boolean isverify = data.getIsverified();
+		String isverify = data.getIsverified();
 		return service.verifyuser(id,isverify);
 	}
 	

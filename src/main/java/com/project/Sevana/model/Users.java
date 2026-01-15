@@ -38,5 +38,5 @@ public class Users {
 	
 	private String location;
 	
-	private Boolean isverified=false;
+	private String isverified="PENDING";
 }

@@ -9,5 +9,5 @@ public class UserDTO {//used in admincontroller.java
 	private String role;
 	private String phone;
 	private String location;
-	private Boolean isverified;
+	private String isverified;
 }

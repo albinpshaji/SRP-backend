@@ -23,12 +23,12 @@ public interface Userrepo extends JpaRepository<Users,Long>{
 	@Modifying
 	@Transactional
 	@Query(value="update users set isverified =:isverify,role ='NGO' where userid=:id",nativeQuery=true)
-	int verifyuser(@Param("id")Long id,@Param("isverify")Boolean isverify);
+	int verifyuser(@Param("id")Long id,@Param("isverify")String isverify);
 	
 	@Modifying
 	@Transactional
 	@Query(value="update users set isverified =:isverify,role ='NV_NGO' where userid=:id",nativeQuery=true)
-	int rejectuser(@Param("id")Long id,@Param("isverify")Boolean isverify);
+	int rejectuser(@Param("id")Long id,@Param("isverify")String isverify);
 	
 	
 }

@@ -13,15 +13,16 @@ public class Adminservice {
 	public Adminservice(Userrepo repo) {
 		this.repo = repo;
 	}
-	public String verifyuser(Long id,Boolean isverify) {//when someone registers as ngo it is saved as NV_NGO as role,when it is verified it is turned to NGO
+	public String verifyuser(Long id,String isverify) {//when someone registers as ngo it is saved as NV_NGO as role,when it is verified it is turned to NGO
 		Users ngos = repo.findById(id).orElse(null);
 		String role = ngos.getRole();
 		if(!(role.equals("NV_NGO") || role.equals("NGO"))) {
 			return "not a ngo";
 		}
 		
-		if(isverify) {//if isverify is true it verifies the user, makes changes to the role
+		if(isverify.equals("ACCEPTED")) {//if isverify is true it verifies the user, makes changes to the role
 			try {
+				System.out.println("call has reached");
 				repo.verifyuser(id,isverify);
 				return "verified";
 			}
@@ -29,7 +30,7 @@ public class Adminservice {
 				return "error"+e;
 			}
 		}
-		else {
+		else if(isverify.equals("REJECTED")){
 			try {
 				repo.rejectuser(id, isverify);//if isverify is false it rejects the user, makes changes to the role
 				return "rejected";
@@ -37,6 +38,9 @@ public class Adminservice {
 			catch(Exception e) {
 				return "error"+e;
 			}
+		}
+		else {
+			return "user verification issue";
 		}
 	}
 	public String deleteuser(Long did) {

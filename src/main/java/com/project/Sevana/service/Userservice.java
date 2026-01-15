@@ -34,7 +34,7 @@ public class Userservice {
 		if(user.getRole().equals("NGO")) {
 			user.setRole("NV_NGO");//not verified ngo
 		}
-		user.setIsverified(false);
+		user.setIsverified("REJECTED");
 		user.setPassword(encoder.encode(user.getPassword()));//encodes the password before saving into db
 		return repo.save(user);
 	}
