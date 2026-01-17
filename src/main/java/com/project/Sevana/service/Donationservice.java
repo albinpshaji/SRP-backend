@@ -1,10 +1,13 @@
 package com.project.Sevana.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.project.Sevana.DTO.DonationDTO;
 import com.project.Sevana.model.Donations;
@@ -28,7 +31,7 @@ public class Donationservice {
 		return userrepo.findByUsername(username);
 	}
 	
-	public String givedirectdonation(DonationDTO data) {
+	public String givedirectdonation(DonationDTO data,MultipartFile imagefile) throws IOException {
 		Users donor = getAuthenticatedUser();
 		Users recepient = userrepo.findById(data.getRecepientid()).orElse(null);
 		if(donor==null)
@@ -44,7 +47,9 @@ public class Donationservice {
 		donation.setPickupLocation(data.getPickuplocation());
 		donation.setStatus("PENDING");
 		donation.setLogistics(data.getLogistics());
-		donation.setImageurl(data.getImageurl());
+		donation.setImagetype(imagefile.getContentType());
+		donation.setImagename(imagefile.getOriginalFilename());
+		donation.setImagedata(imagefile.getBytes());
 		donation.setDonor(donor);
 		donation.setRecipient(recepient);
 		donrepo.save(donation);
@@ -58,17 +63,20 @@ public class Donationservice {
 	public List<Users> showngos(String role) {
 		return userrepo.findByRole(role);
 	}
-
+	
+	@Transactional(readOnly = true)
 	public List<Donations> getmydonations() {
 		Long uid = getAuthenticatedUser().getUserid();
 		return donrepo.findByDonorUserid(uid);
 	}
-
+	
+	@Transactional(readOnly = true)
 	public List<Donations> getincomingdonations() {
 		String username = getAuthenticatedUser().getUsername();
 		return donrepo.findByRecipientUsername(username);
 	}
-
+	
+	@Transactional
 	public String acceptdonations(Long id,String status) {
 		Long nid = getAuthenticatedUser().getUserid();
 		Donations dono = donrepo.getCorrectNgo(id,nid);
@@ -84,6 +92,18 @@ public class Donationservice {
 		catch(Exception e) {
 			return "failure"+e;
 		}
+	}
+	
+	@Transactional(readOnly = true)
+	public Donations getdonationbyid(long donid) {
+		
+		Donations don = donrepo.findById(donid).orElse(null);
+		
+		if(don!=null)
+			return don;
+		
+		return null;
+		
 	}
 
 	

@@ -13,5 +13,7 @@ public class DonationDTO {
 	private String category;
 	private String pickuplocation;
 	private Long recepientid;
-	private String imageurl;
+	private String imagename;
+	private String imagetype;
+	private byte[] imagedata;
 }
