@@ -24,10 +24,10 @@ public class AuthController {
 	}
 	
 	@PostMapping("/register")
-	public ResponseEntity<?> registeruser(@RequestPart UserDTO user,@RequestPart(required=false) MultipartFile imagefile) {
+	public ResponseEntity<?> registeruser(@RequestPart UserDTO user,@RequestPart(required=false) MultipartFile proof,@RequestPart(required=false) MultipartFile profilepic) {
 		try {
-			Users u = service.registeruser(user,imagefile);
-			return new ResponseEntity<>(u,HttpStatus.CREATED);
+			Users u = service.registeruser(user,proof,profilepic);
+			return new ResponseEntity<>(u,HttpStatus.CREATED); 
 
 		}
 		catch(Exception e) {

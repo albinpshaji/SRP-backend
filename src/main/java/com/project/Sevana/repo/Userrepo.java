@@ -13,11 +13,15 @@ import com.project.Sevana.model.Users;
 @Repository
 public interface Userrepo extends JpaRepository<Users,Long>{
 
+	//there is a new constructor in users which does not accept images so that the login should work
+	@Query("SELECT new com.project.Sevana.model.Users(u.userid, u.username, u.password, u.role, u.phone, u.location, u.isverified) FROM Users u WHERE u.username = :username")
 	Users findByUsername(String username);
 	
+	@Query("SELECT new com.project.Sevana.model.Users(u.userid, u.username, u.password, u.role, u.phone, u.location, u.isverified) FROM Users u WHERE u.role = :role OR u.role = 'NV_NGO'")
 	List<Users> findByRole(String role);
 	
-	@Query(value="select * from users where role in(:role1,:role2)",nativeQuery=true)
+	@Query("SELECT new com.project.Sevana.model.Users(u.userid, u.username, u.password, u.role, u.phone, u.location, u.isverified) " +
+		       "FROM Users u WHERE u.role IN (:role1, :role2)")
 	List<Users> findByRoles(@Param("role1")String role1,@Param("role2")String role2);
 	
 	@Modifying

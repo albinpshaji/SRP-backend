@@ -41,7 +41,7 @@ public class Userservice {
 
 	private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 	
-	public Users registeruser(UserDTO user,MultipartFile imagefile) throws IOException {//when someone registers as ngo it is saved as NV_NGO as role,when it is verified it is turned to NGO
+	public Users registeruser(UserDTO user,MultipartFile proof,MultipartFile profilepic) throws IOException {//when someone registers as ngo it is saved as NV_NGO as role,when it is verified it is turned to NGO
 		Users userdata = new Users();
 		userdata.setUsername(user.getUsername());
 		userdata.setRole(user.getRole());
@@ -49,16 +49,23 @@ public class Userservice {
 		userdata.setLocation(user.getLocation());
 		userdata.setIsverified("PENDING");
 		userdata.setPassword(encoder.encode(user.getPassword()));//encodes the password before saving into db
+		if(profilepic!=null && !profilepic.isEmpty()) {
+			userdata.setProfileimagedata(profilepic.getBytes());
+			userdata.setProfileimagename(profilepic.getOriginalFilename());
+			userdata.setProfileimagetype(profilepic.getContentType());
+		}
+		
+		
 		
 		if(userdata.getRole().equals("NGO")) {
 			userdata.setRole("NV_NGO");//not verified ngo
-			if(imagefile!=null && !imagefile.isEmpty()) {
+			if(proof!=null && !proof.isEmpty()) {
 				Ngos ngo = new Ngos();
 				ngo.setLicenceno(user.getLicenceno());
 				ngo.setWebsite(user.getWebsite());
-				ngo.setProofimagename(imagefile.getOriginalFilename());
-				ngo.setProofimagetype(imagefile.getContentType());
-				ngo.setProofimagedata(imagefile.getBytes());
+				ngo.setProofimagename(proof.getOriginalFilename());
+				ngo.setProofimagetype(proof.getContentType());
+				ngo.setProofimagedata(proof.getBytes());
 				Users u=repo.save(userdata);
 				ngo.setUser(u);
 				nrepo.save(ngo);
@@ -80,6 +87,10 @@ public class Userservice {
 
 	public Users findbyusername(String username) {
 		return repo.findByUsername(username);
+	}
+
+	public Users getuserbyid(long usrid) {
+		return repo.findById(usrid).orElse(null);
 	}
 
 }
