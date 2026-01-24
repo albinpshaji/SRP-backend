@@ -2,17 +2,26 @@ package com.project.Sevana.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.project.Sevana.model.Ngos;
 import com.project.Sevana.model.Users;
+import com.project.Sevana.repo.Ngosrepo;
 import com.project.Sevana.repo.Userrepo;
 
 @Service
 public class Adminservice {
 	
 	private Userrepo repo;
+	private Ngosrepo nrepo;
 	@Autowired
-	public Adminservice(Userrepo repo) {
+	public Adminservice(Userrepo repo,Ngosrepo nrepo) {
 		this.repo = repo;
+		this.nrepo = nrepo;
 	}
+	
+	
+	
 	public String verifyuser(Long id,String isverify) {//when someone registers as ngo it is saved as NV_NGO as role,when it is verified it is turned to NGO
 		Users ngos = repo.findById(id).orElse(null);
 		String role = ngos.getRole();
@@ -43,6 +52,9 @@ public class Adminservice {
 			return "user verification issue";
 		}
 	}
+	
+	
+	
 	public String deleteuser(Long did) {
 		Users user=repo.findById(did).orElse(null);
 		if(user==null) {
@@ -56,5 +68,11 @@ public class Adminservice {
 			return "fail"+e;
 		}
 		
+	}
+	
+	
+	@Transactional(readOnly = true)
+	public Ngos findngobyId(Long id) {
+		return nrepo.findById(id).orElse(null);
 	}	
 }
