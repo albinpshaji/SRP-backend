@@ -1,6 +1,7 @@
 package com.project.Sevana.config.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,9 +30,10 @@ public class Admincontroller {
 	
 	@PostMapping("/verify/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public String verifyuser(@PathVariable Long id,@RequestBody UserDTO data){//Uses the UserDTO here to get data from postman
+	public ResponseEntity<String> verifyuser(@PathVariable Long id,@RequestBody UserDTO data){//Uses the UserDTO here to get data from postman
 		String isverify = data.getIsverified();
-		return service.verifyuser(id,isverify);
+		String result = service.verifyuser(id,isverify);
+		return ResponseEntity.ok(result);
 	}
 	
 	@DeleteMapping("/delete/{did}")
@@ -47,18 +49,21 @@ public class Admincontroller {
 	
 	@GetMapping("/proof/{prid}/image")
 	@PreAuthorize("hasAnyAuthority('NGO','ADMIN')")
-	public ResponseEntity<byte[]> getimagebyuserid(@PathVariable long prid){
-		Ngos usr = service.findngobyId(prid);
-		if(usr==null) {
-			System.out.println("No NGO found with ID: " + prid); 
-	        return ResponseEntity.notFound().build();
+	public ResponseEntity<?> getimagebyuserid(@PathVariable long prid){
+		
+			Ngos usr = service.findngobyId(prid);
+			if(usr==null) {
+				System.out.println("No NGO found with ID: " + prid); 
+		        return ResponseEntity.notFound().build();
+			}
+			
+			byte[] image = usr.getProofimagedata();
+			if(image ==null) {
+				return ResponseEntity.notFound().build();
+			}
+			
+			return ResponseEntity.ok().contentType(MediaType.valueOf(usr.getProofimagetype()))
+					.body(image);
 		}
-		byte[] image = usr.getProofimagedata();
-		if(image ==null) {
-			return ResponseEntity.notFound().build();
-		}
-		return ResponseEntity.ok().contentType(MediaType.valueOf(usr.getProofimagetype()))
-				.body(image);
-	}
 	
 }
