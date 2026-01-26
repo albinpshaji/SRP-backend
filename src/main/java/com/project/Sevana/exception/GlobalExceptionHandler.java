@@ -1,4 +1,4 @@
-package com.project.Sevena.exception;
+package com.project.Sevana.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

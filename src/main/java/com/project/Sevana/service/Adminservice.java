@@ -12,12 +12,14 @@ import com.project.Sevana.repo.Userrepo;
 @Service
 public class Adminservice {
 	
-	private Userrepo repo;
-	private Ngosrepo nrepo;
+	private final Userrepo repo;
+	private final Ngosrepo nrepo;
+	private final Donationservice service;
 	@Autowired
-	public Adminservice(Userrepo repo,Ngosrepo nrepo) {
+	public Adminservice(Userrepo repo,Ngosrepo nrepo,Donationservice service) {
 		this.repo = repo;
 		this.nrepo = nrepo;
+		this.service = service;
 	}
 	
 	
@@ -73,6 +75,14 @@ public class Adminservice {
 	
 	@Transactional(readOnly = true)
 	public Ngos findngobyId(Long id) {
-		return nrepo.findById(id).orElse(null);
+		Users u = service.getAuthenticatedUser();
+		
+		if(u.getRole().equals("ADMIN")) {
+			return nrepo.findById(id).orElse(null);
+		}
+		else {
+			long uid = u.getUserid();
+			return nrepo.findById(uid).orElse(null);	
+		}
 	}	
 }

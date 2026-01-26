@@ -17,7 +17,7 @@ public interface Userrepo extends JpaRepository<Users,Long>{
 	@Query("SELECT new com.project.Sevana.model.Users(u.userid, u.username, u.password, u.role, u.phone, u.location, u.isverified) FROM Users u WHERE u.username = :username")
 	Users findByUsername(String username);
 	
-	@Query("SELECT new com.project.Sevana.model.Users(u.userid, u.username, u.password, u.role, u.phone, u.location, u.isverified) FROM Users u WHERE u.role = :role OR u.role = 'NV_NGO'")
+	@Query("SELECT new com.project.Sevana.model.Users(u.userid, u.username, u.password, u.role, u.phone, u.location, u.isverified) FROM Users u WHERE u.role = :role")
 	List<Users> findByRole(String role);
 	
 	@Query("SELECT new com.project.Sevana.model.Users(u.userid, u.username, u.password, u.role, u.phone, u.location, u.isverified) " +

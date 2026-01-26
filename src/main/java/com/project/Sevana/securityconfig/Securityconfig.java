@@ -42,7 +42,7 @@ public class Securityconfig {
 	public SecurityFilterChain securityfilterchain(HttpSecurity http) throws Exception{
 		http.csrf(csrf->csrf.disable());
 		http.cors(Customizer.withDefaults());
-		http.authorizeHttpRequests(requests->requests.requestMatchers("/register/**","/login/**").
+		http.authorizeHttpRequests(requests->requests.requestMatchers("/register/**","/login/**","/not-found").
 				permitAll().anyRequest().authenticated());
 		http.httpBasic(Customizer.withDefaults());
 		http.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

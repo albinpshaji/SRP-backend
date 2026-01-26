@@ -26,7 +26,7 @@ public class Donationservice {
 	}
 	
 	//to get the authenticateduser from jwtitself(stored in memory) used so that a user cant impersonate as an another person
-	private Users getAuthenticatedUser() {
+	Users getAuthenticatedUser() {
 		String username= SecurityContextHolder.getContext().getAuthentication().getName();
 		return userrepo.findByUsername(username);
 	}
