@@ -33,10 +33,12 @@ public class Donationservice {
 	
 	public String givedirectdonation(DonationDTO data,MultipartFile imagefile) throws IOException {
 		Users donor = getAuthenticatedUser();
+		
+		
 		Users recepient = userrepo.findById(data.getRecepientid()).orElse(null);
 		if(donor==null)
 			return "Error:you are not logged in properly";
-		if(recepient==null)
+		if(recepient==null)//this is for if the user sents a fake recepient id
 			return "Error:ngo selected not exists";
 		if(!recepient.getRole().equals("NGO"))
 			return "This is not a ngo";
