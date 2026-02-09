@@ -33,10 +33,27 @@ public class Donationservice {
 	
 	public String givedirectdonation(DonationDTO data,MultipartFile imagefile) throws IOException {
 		Users donor = getAuthenticatedUser();
+		if(data.getRecepientid()==null) {//this is for the market place
+			Donations donation = new Donations();
+			donation.setTitle(data.getTitle());
+			donation.setCategory(data.getCategory());
+			donation.setDescription(data.getDescription());
+			donation.setPickupLocation(data.getPickuplocation());
+			donation.setStatus("PENDING");
+			donation.setLogistics(data.getLogistics());
+			donation.setImagetype(imagefile.getContentType());
+			donation.setImagename(imagefile.getOriginalFilename());
+			donation.setImagedata(imagefile.getBytes());
+			donation.setDonor(donor);
+			donation.setRecipient(null);
+			donrepo.save(donation);
+			return "success";
+		}
+		
 		Users recepient = userrepo.findById(data.getRecepientid()).orElse(null);
 		if(donor==null)
 			return "Error:you are not logged in properly";
-		if(recepient==null)
+		if(recepient==null)//this is for if the user sents a fake recepient id
 			return "Error:ngo selected not exists";
 		if(!recepient.getRole().equals("NGO"))
 			return "This is not a ngo";
