@@ -1,15 +1,25 @@
 package com.project.Sevana.config.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.Sevana.DTO.UserDTO;
+import com.project.Sevana.model.Ngos;
+import com.project.Sevana.model.Users;
+import com.project.Sevana.repo.Ngosrepo;
 import com.project.Sevana.service.Adminservice;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 public class Admincontroller {
@@ -23,14 +33,46 @@ public class Admincontroller {
 	
 	@PostMapping("/verify/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public String verifyuser(@PathVariable Long id,@RequestBody UserDTO data){//Uses the UserDTO here to get data from postman
-		String isverify = data.getIsverified();
-		return service.verifyuser(id,isverify);
+	public ResponseEntity<String> verifyuser(@PathVariable Long id,@RequestBody UserDTO data){//Uses the UserDTO here to get data from postman
+		service.verifyuser(id,data.getIsverified());
+		return ResponseEntity.ok("user verification updated successfully");
 	}
 	
 	@DeleteMapping("/delete/{did}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public String deleteuser(@PathVariable Long did) {
-		return service.deleteuser(did);
+	public ResponseEntity<String> deleteuser(@PathVariable Long did) {
+		service.deleteuser(did);
+		return ResponseEntity.noContent().build();
 	}
+	
+	@GetMapping("/ngodetails/{id}")
+	public ResponseEntity<Ngos> ngoDetails(@PathVariable Long id) {
+		Ngos details = service.findngobyId(id);
+		return ResponseEntity.ok(details);
+	}
+	
+	@GetMapping("/proof/{prid}/image")
+	@PreAuthorize("hasAnyAuthority('NGO','ADMIN')")
+	public ResponseEntity<byte[]> getimagebyuserid(@PathVariable long prid){
+		
+			Ngos usr = service.findngobyId(prid);
+			if(usr==null) {
+				System.out.println("No NGO found with ID: " + prid); 
+		        return ResponseEntity.notFound().build();
+			}
+			
+			byte[] image = usr.getProofimagedata();
+			if(image ==null) {
+				return ResponseEntity.notFound().build();
+			}
+			
+			return ResponseEntity.ok().contentType(MediaType.valueOf(usr.getProofimagetype()))
+					.body(image);
+	}
+	
+	@GetMapping("/not-found")
+    public void throwNotFound() {
+        throw new AccessDeniedException("Test validation: Not allowed");
+    }
+	
 }

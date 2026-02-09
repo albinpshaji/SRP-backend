@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: sevana-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/sevana
+      - SPRING_DATASOURCE_USERNAME=albin
+      - SPRING_DATASOURCE_PASSWORD=albin
+    depends_on:
+      - postgres
+    networks:
+      - sevana-net
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: sevana-db
+    environment: 
+      - POSTGRES_USER=albin
+      - POSTGRES_PASSWORD=albin
+      - POSTGRES_DB=sevana
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sevana-net
+
+volumes:
+  postgres_data:
+
+networks:
+  sevana-net:
+    driver: bridge
+    
