@@ -54,6 +54,14 @@ public class Donationcontroller {
 		
 	}
 	
+	@GetMapping("/getmarketplaceitems")
+	@PreAuthorize("hasAuthority('NGO')")
+	public ResponseEntity<List<Donations>> getmarketplaceitems(){
+		List<Donations> donations = service.getmarketplacedonations();
+		return ResponseEntity.ok(donations);
+	}
+	
+	
 	@GetMapping("/mydonations")
 	@PreAuthorize("hasAuthority('DONOR')")
 	public List<Donations> getmydonations(){
@@ -83,6 +91,13 @@ public class Donationcontroller {
 	public String acceptdonations(@PathVariable Long id,@RequestBody DonationDTO datastatus) {
 		String status = datastatus.getStatus();
 		return service.acceptdonations(id,status);
+	}
+	
+	@PutMapping("/ngos/marketplace/claim/{donid}")
+	@PreAuthorize("hasAuthority('NGO')")
+	public ResponseEntity<String> claimItem(@PathVariable Long donid){
+		String sta = service.claimItem(donid);
+		return ResponseEntity.ok("item claimed successfully");
 	}
 	
 }

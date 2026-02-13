@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,6 +122,17 @@ public class Donationservice {
 		
 		return null;
 		
+	}
+	
+	@Transactional(readOnly=true)
+	public List<Donations> getmarketplacedonations() {
+		return donrepo.findformarketplace(); 
+	}
+
+	public String claimItem(Long id) {
+		Long rid = getAuthenticatedUser().getUserid();
+		donrepo.claimitem(id,rid);
+		return "donation claiming has been done";
 	}
 
 	
