@@ -39,7 +39,7 @@ public class Donationcontroller {
 	@GetMapping("/ngos")
 	@PreAuthorize("hasAnyAuthority('ADMIN','DONOR')")
 	public List<Users> showngos(@RequestParam(required = false) String keyword){
-		return service.showngos("NGO",keyword);
+		return service.showngos(keyword);
 	}
 	
 	@PostMapping("/ngos/donate")

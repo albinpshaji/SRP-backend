@@ -79,11 +79,8 @@ public class Donationservice {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<Users> showngos(String role,String keyword) {
-		if(keyword!=null) {
-			return userrepo.searchbyanything(keyword);
-		}
-		return userrepo.findByRole(role);
+	public List<Users> showngos(String keyword) {
+		return userrepo.searchbyanything(keyword);
 	}
 	
 	@Transactional(readOnly = true)
