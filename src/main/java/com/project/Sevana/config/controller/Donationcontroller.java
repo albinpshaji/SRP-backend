@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,8 +38,8 @@ public class Donationcontroller {
 	
 	@GetMapping("/ngos")
 	@PreAuthorize("hasAnyAuthority('ADMIN','DONOR')")
-	public List<Users> showngos(){
-		return service.showngos("NGO");
+	public List<Users> showngos(@RequestParam(required = false) String keyword){
+		return service.showngos("NGO",keyword);
 	}
 	
 	@PostMapping("/ngos/donate")
