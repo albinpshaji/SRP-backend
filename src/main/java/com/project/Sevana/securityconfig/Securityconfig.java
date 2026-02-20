@@ -54,7 +54,7 @@ public class Securityconfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration confi = new CorsConfiguration();
-		confi.setAllowedOrigins(List.of("http://localhost:5173"));
+		confi.setAllowedOrigins(List.of("http://localhost:5173","https://sevana-frontend.vercel.app"));
 		confi.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		confi.setAllowedHeaders(List.of("Authorization","Content-Type"));
 		confi.setAllowCredentials(true);
