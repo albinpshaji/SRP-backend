@@ -1,6 +1,7 @@
 package com.project.Sevana.config.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,8 +39,12 @@ public class Donationcontroller {
 	
 	@GetMapping("/ngos")
 	@PreAuthorize("hasAnyAuthority('ADMIN','DONOR')")
-	public List<Users> showngos(){
-		return service.showngos("NGO");
+	public ResponseEntity<Map<String,Object>> showngos(@RequestParam(required = false) String keyword,
+													   @RequestParam(defaultValue="0") Long lastid,
+													   @RequestParam(defaultValue="2") int size){
+		
+		Map<String,Object> response = service.showngos(keyword,lastid,size);
+		return ResponseEntity.ok(response);
 	}
 	
 	@PostMapping("/ngos/donate")
@@ -53,6 +59,14 @@ public class Donationcontroller {
 		}
 		
 	}
+	
+	@GetMapping("/getmarketplaceitems")
+	@PreAuthorize("hasAuthority('NGO')")
+	public ResponseEntity<List<Donations>> getmarketplaceitems(){
+		List<Donations> donations = service.getmarketplacedonations();
+		return ResponseEntity.ok(donations);
+	}
+	
 	
 	@GetMapping("/mydonations")
 	@PreAuthorize("hasAuthority('DONOR')")
@@ -83,6 +97,13 @@ public class Donationcontroller {
 	public String acceptdonations(@PathVariable Long id,@RequestBody DonationDTO datastatus) {
 		String status = datastatus.getStatus();
 		return service.acceptdonations(id,status);
+	}
+	
+	@PutMapping("/ngos/marketplace/claim/{donid}")
+	@PreAuthorize("hasAuthority('NGO')")
+	public ResponseEntity<String> claimItem(@PathVariable Long donid){
+		String sta = service.claimItem(donid);
+		return ResponseEntity.ok("item claimed successfully");
 	}
 	
 }

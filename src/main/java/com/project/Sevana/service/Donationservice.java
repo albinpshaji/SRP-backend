@@ -1,9 +1,12 @@
 package com.project.Sevana.service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,8 +80,21 @@ public class Donationservice {
 		return userrepo.findByRoles(role1,role2);
 	}
 	
-	public List<Users> showngos(String role) {
-		return userrepo.findByRole(role);
+	@Transactional(readOnly = true)
+	public Map<String,Object> showngos(String keyword, Long lastid, int size) {
+		Map<String,Object> res = new HashMap<>();
+		List<Users> ngos = userrepo.searchbyanything(keyword, lastid, size);
+		
+		Long nextCursor = null;
+		if(!ngos.isEmpty()) {
+			nextCursor = ngos.get(ngos.size()-1).getUserid();
+		}
+		
+		res.put("nextCursor", nextCursor);
+		res.put("content", ngos);
+		res.put("hasMore", ngos.size()==size);
+		
+		return res;
 	}
 	
 	@Transactional(readOnly = true)
@@ -121,6 +137,17 @@ public class Donationservice {
 		
 		return null;
 		
+	}
+	
+	@Transactional(readOnly=true)
+	public List<Donations> getmarketplacedonations() {
+		return donrepo.findformarketplace(); 
+	}
+
+	public String claimItem(Long id) {
+		Long rid = getAuthenticatedUser().getUserid();
+		donrepo.claimitem(id,rid);
+		return "donation claiming has been done";
 	}
 
 	
