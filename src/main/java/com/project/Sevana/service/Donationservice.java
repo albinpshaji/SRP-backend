@@ -1,7 +1,9 @@
 package com.project.Sevana.service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -79,8 +81,20 @@ public class Donationservice {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<Users> showngos(String keyword) {
-		return userrepo.searchbyanything(keyword);
+	public Map<String,Object> showngos(String keyword, Long lastid, int size) {
+		Map<String,Object> res = new HashMap<>();
+		List<Users> ngos = userrepo.searchbyanything(keyword, lastid, size);
+		
+		Long nextCursor = null;
+		if(!ngos.isEmpty()) {
+			nextCursor = ngos.get(ngos.size()-1).getUserid();
+		}
+		
+		res.put("nextCursor", nextCursor);
+		res.put("content", ngos);
+		res.put("hasMore", ngos.size()==size);
+		
+		return res;
 	}
 	
 	@Transactional(readOnly = true)

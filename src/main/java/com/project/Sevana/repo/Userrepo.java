@@ -37,9 +37,10 @@ public interface Userrepo extends JpaRepository<Users,Long>{
 	@Query(value = """
 			select * from users where(
 			lower(username) like lower(concat('%',:keyword,'%')) or
-			lower(location) like lower(concat('%',:keyword,'%'))) and role='NGO'
+			lower(location) like lower(concat('%',:keyword,'%'))) and role='NGO' and userid>:lastid
+			order by userid ASC limit :size
 			""", nativeQuery = true)
-	List<Users> searchbyanything(@Param("keyword") String keyword);
+	List<Users> searchbyanything(@Param("keyword") String keyword,@Param("lastid")Long lastid,@Param("size") int size);
 	
 	
 }

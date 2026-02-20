@@ -1,6 +1,7 @@
 package com.project.Sevana.config.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,8 +39,12 @@ public class Donationcontroller {
 	
 	@GetMapping("/ngos")
 	@PreAuthorize("hasAnyAuthority('ADMIN','DONOR')")
-	public List<Users> showngos(@RequestParam(required = false) String keyword){
-		return service.showngos(keyword);
+	public ResponseEntity<Map<String,Object>> showngos(@RequestParam(required = false) String keyword,
+													   @RequestParam(defaultValue="0") Long lastid,
+													   @RequestParam(defaultValue="2") int size){
+		
+		Map<String,Object> response = service.showngos(keyword,lastid,size);
+		return ResponseEntity.ok(response);
 	}
 	
 	@PostMapping("/ngos/donate")
