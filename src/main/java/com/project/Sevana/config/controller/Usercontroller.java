@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.Sevana.DTO.UserDTO;
 import com.project.Sevana.model.Donations;
 import com.project.Sevana.model.Users;
 import com.project.Sevana.service.Userservice;
@@ -24,6 +25,13 @@ public class Usercontroller {
 		this.service=service;
 	}
 	
+	@GetMapping("/users/{userid}")
+	@PreAuthorize("hasAnyAuthority('DONOR','NGO')")
+	public ResponseEntity<UserDTO> getprofiledata(@PathVariable Long userid){
+		UserDTO data = service.getprofiledata(userid);
+		return ResponseEntity.ok(data);
+		
+	}
 	
 	@GetMapping("/users")
 	@PreAuthorize("hasAuthority('ADMIN')")

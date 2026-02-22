@@ -84,7 +84,7 @@ public class Userservice {
 			return jwtservice.generatetoken(user.getUsername());
 		return "fail";
 	}
-
+	
 	public Users findbyusername(String username) {
 		return repo.findByUsername(username);
 	}
@@ -92,5 +92,18 @@ public class Userservice {
 	public Users getuserbyid(long usrid) {
 		return repo.findById(usrid).orElse(null);
 	}
+
+	public UserDTO getprofiledata(Long userid) {
+		Users data = repo.findById(userid).orElse(null);
+		UserDTO user = new UserDTO();
+		user.setUserid(data.getUserid());
+		user.setUsername(data.getUsername());
+		user.setPhone(data.getPhone());
+		user.setLocation(data.getLocation());
+		
+		return user;
+	}
+
+	
 
 }
