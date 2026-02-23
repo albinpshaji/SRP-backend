@@ -1,5 +1,7 @@
 package com.project.Sevana.model;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -54,6 +56,9 @@ public class Users {
 	private String location;
 	
 	private String isverified="PENDING";
+	
+	@Column(nullable = false, updatable = false)
+	private LocalDateTime createdAt = LocalDateTime.now();
 	
 	@JsonIgnore
     private String profileimagetype;

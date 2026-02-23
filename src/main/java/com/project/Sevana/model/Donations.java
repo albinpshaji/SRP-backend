@@ -1,4 +1,6 @@
 package com.project.Sevana.model;
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -36,6 +38,9 @@ public class Donations {
 	private String category;
 	
 	private String pickupLocation;
+	
+	@Column(nullable = false, updatable = false)
+	private LocalDateTime createdAt = LocalDateTime.now();
 	
 	@ManyToOne
 	@JoinColumn(name="donor_id")
