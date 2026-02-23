@@ -9,9 +9,8 @@ public class DonationDTO {
 	private String title;
 	private String description;
 	private String status;
-	private String logistics;
+	private LogisticsDTO logistics;
 	private String category;
-	private String pickuplocation;
 	private Long recepientid;
 	private String imagename;
 	private String imagetype;

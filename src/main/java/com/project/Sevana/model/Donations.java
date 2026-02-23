@@ -3,6 +3,7 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,15 +33,15 @@ public class Donations {
 	
 	private String description;
 	
-	private String status;
+	private String status;//pending,accepted,rejected
 	
-	private String logistics = "DROPOF";
+	@OneToOne(mappedBy = "donation")
+    private Logistics logistics;
 	
 	private String category;
 	
-	private String pickupLocation;
 	
-	@Column(nullable = false, updatable = false)
+	@Column(updatable = false)
 	private LocalDateTime createdAt = LocalDateTime.now();
 	
 	@ManyToOne

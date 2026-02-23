@@ -14,18 +14,23 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.project.Sevana.DTO.DonationDTO;
 import com.project.Sevana.model.Donations;
+import com.project.Sevana.model.Logistics;
 import com.project.Sevana.model.Users;
 import com.project.Sevana.repo.Donationrepo;
+import com.project.Sevana.repo.Logisticsrepo;
 import com.project.Sevana.repo.Userrepo;
 
 @Service
 public class Donationservice {
 	private final Donationrepo donrepo;
 	private final Userrepo userrepo;
+	private final Logisticsrepo logisticsrepo;
+	
 	@Autowired
-	public Donationservice(Donationrepo donrepo,Userrepo userrepo){
+	public Donationservice(Donationrepo donrepo,Userrepo userrepo,Logisticsrepo logisticsrepo){
 		this.donrepo=donrepo;
 		this.userrepo=userrepo;
+		this.logisticsrepo=logisticsrepo;
 	}
 	
 	//to get the authenticateduser from jwtitself(stored in memory) used so that a user cant impersonate as an another person
@@ -34,45 +39,73 @@ public class Donationservice {
 		return userrepo.findByUsername(username);
 	}
 	
+	@Transactional
 	public String givedirectdonation(DonationDTO data,MultipartFile imagefile) throws IOException {
 		Users donor = getAuthenticatedUser();
+		
 		if(data.getRecepientid()==null) {//this is for the market place
 			Donations donation = new Donations();
 			donation.setTitle(data.getTitle());
 			donation.setCategory(data.getCategory());
 			donation.setDescription(data.getDescription());
-			donation.setPickupLocation(data.getPickuplocation());
 			donation.setStatus("PENDING");
-			donation.setLogistics(data.getLogistics());
 			donation.setImagetype(imagefile.getContentType());
 			donation.setImagename(imagefile.getOriginalFilename());
 			donation.setImagedata(imagefile.getBytes());
 			donation.setDonor(donor);
 			donation.setRecipient(null);
-			donrepo.save(donation);
+			
+			
+			Donations savedDonation = donrepo.save(donation);
+			
+			
+			if (data.getLogistics() != null) {
+				Logistics logistics = new Logistics();
+				logistics.setMethod(data.getLogistics().getMethod());
+				logistics.setAddressLine(data.getLogistics().getAddress_line());
+				logistics.setPickupdate(data.getLogistics().getPickupdate());
+				logistics.setDeliverystatus("PENDING");
+				logistics.setDonation(savedDonation); 
+				
+				logisticsrepo.save(logistics); 
+			}
 			return "success";
 		}
 		
 		Users recepient = userrepo.findById(data.getRecepientid()).orElse(null);
 		if(donor==null)
 			return "Error:you are not logged in properly";
-		if(recepient==null)//this is for if the user sents a fake recepient id
+		if(recepient==null)
 			return "Error:ngo selected not exists";
 		if(!recepient.getRole().equals("NGO"))
 			return "This is not a ngo";
+			
 		Donations donation = new Donations();
 		donation.setTitle(data.getTitle());
 		donation.setCategory(data.getCategory());
 		donation.setDescription(data.getDescription());
-		donation.setPickupLocation(data.getPickuplocation());
 		donation.setStatus("PENDING");
-		donation.setLogistics(data.getLogistics());
 		donation.setImagetype(imagefile.getContentType());
 		donation.setImagename(imagefile.getOriginalFilename());
 		donation.setImagedata(imagefile.getBytes());
 		donation.setDonor(donor);
 		donation.setRecipient(recepient);
-		donrepo.save(donation);
+		
+		
+		Donations savedDonation = donrepo.save(donation);
+		
+		
+		if (data.getLogistics() != null) {
+			Logistics logistics = new Logistics();
+			logistics.setMethod(data.getLogistics().getMethod());
+			logistics.setAddressLine(data.getLogistics().getAddress_line());
+			logistics.setPickupdate(data.getLogistics().getPickupdate());
+			logistics.setDeliverystatus("PENDING");
+			logistics.setDonation(savedDonation); 
+			
+			logisticsrepo.save(logistics); 
+		}
+		
 		return "success";
 	}
 
@@ -120,6 +153,11 @@ public class Donationservice {
 		
 		try {
 			donrepo.updatestatus(id,status);
+			
+			if ("accepted".equalsIgnoreCase(status)) {
+				logisticsrepo.updateDeliveryStatusByDonationId(id, "ACCEPTED");
+			}
+			
 			return "success";
 		}
 		catch(Exception e) {
@@ -144,9 +182,11 @@ public class Donationservice {
 		return donrepo.findformarketplace(); 
 	}
 
+	@Transactional
 	public String claimItem(Long id) {
 		Long rid = getAuthenticatedUser().getUserid();
 		donrepo.claimitem(id,rid);
+		logisticsrepo.updateDeliveryStatusByDonationId(id, "ACCEPTED");
 		return "donation claiming has been done";
 	}
 
