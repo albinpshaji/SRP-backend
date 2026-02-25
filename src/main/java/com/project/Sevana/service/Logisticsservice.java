@@ -8,10 +8,13 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
 import com.project.Sevana.DTO.LogisticsDTO;
+import com.project.Sevana.DTO.LogisticsResponseDTO;
 import com.project.Sevana.model.Logistics;
+import com.project.Sevana.model.Donations;
 import com.project.Sevana.model.Users;
 import com.project.Sevana.repo.Logisticsrepo;
 import com.project.Sevana.repo.Userrepo;
+import java.util.stream.Collectors;
 
 @Service
 public class Logisticsservice {
@@ -32,9 +35,34 @@ public class Logisticsservice {
 
     
     @Transactional
-    public List<Logistics> getLogisticsForNgo() {
+    public List<LogisticsResponseDTO> getLogisticsForNgo() {
         String username = getAuthenticatedUser().getUsername();
-        return logisticsrepo.findByDonationRecipientUsername(username);
+        List<Logistics> logisticsList = logisticsrepo.findByDonationRecipientUsername(username);
+        
+        return logisticsList.stream().map(logistics -> {
+            LogisticsResponseDTO dto = new LogisticsResponseDTO();
+            dto.setLogisticsid(logistics.getLogisticsid());
+            dto.setMethod(logistics.getMethod());
+            dto.setAddressLine(logistics.getAddressLine());
+            dto.setPickupdate(logistics.getPickupdate());
+            dto.setDeliverystatus(logistics.getDeliverystatus());
+            dto.setCreatedAt(logistics.getCreatedAt());
+            
+            if (logistics.getUpdatedBy() != null) {
+                dto.setUpdatedByUsername(logistics.getUpdatedBy().getUsername());
+            }
+            
+            Donations donation = logistics.getDonation();
+            if (donation != null) {
+                dto.setDonationId(donation.getDonationid());
+                dto.setDonationTitle(donation.getTitle());
+                dto.setCategory(donation.getCategory());
+                if (donation.getDonor() != null) {
+                    dto.setDonorUsername(donation.getDonor().getUsername());
+                }
+            }
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     

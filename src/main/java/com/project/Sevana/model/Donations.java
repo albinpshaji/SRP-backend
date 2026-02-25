@@ -41,7 +41,7 @@ public class Donations {
 	private String category;
 	
 	
-	@Column(updatable = false)
+	@Column(nullable = false)
 	private LocalDateTime createdAt = LocalDateTime.now();
 	
 	@ManyToOne

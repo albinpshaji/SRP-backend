@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.Sevana.DTO.LogisticsDTO;
+import com.project.Sevana.DTO.LogisticsResponseDTO;
 import com.project.Sevana.model.Logistics;
 import com.project.Sevana.service.Logisticsservice;
 
@@ -28,7 +29,7 @@ public class Logisticscontroller {
     
     @GetMapping("/logistics")
     @PreAuthorize("hasAuthority('NGO')")
-    public ResponseEntity<List<Logistics>> getLogisticsForNgo() {
+    public ResponseEntity<List<LogisticsResponseDTO>> getLogisticsForNgo() {
         return ResponseEntity.ok(logisticsservice.getLogisticsForNgo());
     }
 

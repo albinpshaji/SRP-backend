@@ -50,7 +50,7 @@ public class Logistics {
     @JoinColumn(name="updated_by")
     private Users updatedBy; 
 
-    @Column(updatable = false)
+    @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     private LocalDateTime updatedAt = LocalDateTime.now();
