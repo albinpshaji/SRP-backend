@@ -91,6 +91,17 @@ public class Donationcontroller {
 	public List<Donations> getincomingdonations(){
 		return service.getincomingdonations();
 	}
+
+	@GetMapping("/incomingdonations/{id}")
+	@PreAuthorize("hasAuthority('NGO')")
+	public ResponseEntity<Donations> getincomingdonationbyid(@PathVariable Long id){
+		Donations don = service.getdonationbyid(id);
+		if(don != null) {
+			return ResponseEntity.ok(don);
+		}
+		return ResponseEntity.notFound().build();
+	}
+	
 	
 	@PutMapping("/incomingdonations/{id}")
 	@PreAuthorize("hasAuthority('NGO')")
