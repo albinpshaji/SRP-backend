@@ -9,10 +9,13 @@ public class DonationDTO {
 	private String title;
 	private String description;
 	private String status;
-	private String logistics;
+	private LogisticsDTO logistics;
 	private String category;
-	private String pickuplocation;
 	private Long recepientid;
+	
+	// Fields for Requirements fulfillment
+	private Long requirementid;
+	private Integer quantityProvided;
 	private String imagename;
 	private String imagetype;
 	private byte[] imagedata;

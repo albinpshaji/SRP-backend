@@ -37,6 +37,12 @@ public class Donationcontroller {
 		return service.showallngos("NGO","NV_NGO");
 	}
 	
+	@GetMapping("/verngos")
+	@PreAuthorize("hasAnyAuthority('ADMIN')")
+	public List<Users> showaverifiedngos(){
+		return service.showverifiedngos("NGO");
+	}
+	
 	@GetMapping("/ngos")
 	@PreAuthorize("hasAnyAuthority('ADMIN','DONOR')")
 	public ResponseEntity<Map<String,Object>> showngos(@RequestParam(required = false) String keyword,
@@ -91,6 +97,17 @@ public class Donationcontroller {
 	public List<Donations> getincomingdonations(){
 		return service.getincomingdonations();
 	}
+
+	@GetMapping("/incomingdonations/{id}")
+	@PreAuthorize("hasAuthority('NGO')")
+	public ResponseEntity<Donations> getincomingdonationbyid(@PathVariable Long id){
+		Donations don = service.getdonationbyid(id);
+		if(don != null) {
+			return ResponseEntity.ok(don);
+		}
+		return ResponseEntity.notFound().build();
+	}
+	
 	
 	@PutMapping("/incomingdonations/{id}")
 	@PreAuthorize("hasAuthority('NGO')")

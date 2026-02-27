@@ -57,7 +57,7 @@ public class Users {
 	
 	private String isverified="PENDING";
 	
-	@Column(nullable = false, updatable = false)
+	@Column(updatable = false)
 	private LocalDateTime createdAt = LocalDateTime.now();
 	
 	@JsonIgnore
