@@ -52,6 +52,12 @@ public class Donations {
 	@JoinColumn(name="recipient_id")
 	private Users recipient;
 	
+	@ManyToOne
+	@JoinColumn(name="requirement_id")
+	private Requirements requirement;
+	
+	private Integer quantityProvided;
+	
 	@JsonIgnore
 	private String imagename;
 	

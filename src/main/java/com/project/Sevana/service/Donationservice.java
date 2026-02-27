@@ -15,9 +15,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.project.Sevana.DTO.DonationDTO;
 import com.project.Sevana.model.Donations;
 import com.project.Sevana.model.Logistics;
+import com.project.Sevana.model.Requirements;
 import com.project.Sevana.model.Users;
 import com.project.Sevana.repo.Donationrepo;
 import com.project.Sevana.repo.Logisticsrepo;
+import com.project.Sevana.repo.Ngorequirementrepo;
 import com.project.Sevana.repo.Userrepo;
 
 @Service
@@ -25,12 +27,14 @@ public class Donationservice {
 	private final Donationrepo donrepo;
 	private final Userrepo userrepo;
 	private final Logisticsrepo logisticsrepo;
+	private final Ngorequirementrepo ngorequirementrepo;
 	
 	@Autowired
-	public Donationservice(Donationrepo donrepo,Userrepo userrepo,Logisticsrepo logisticsrepo){
+	public Donationservice(Donationrepo donrepo,Userrepo userrepo,Logisticsrepo logisticsrepo,Ngorequirementrepo ngorequirementrepo){
 		this.donrepo=donrepo;
 		this.userrepo=userrepo;
 		this.logisticsrepo=logisticsrepo;
+		this.ngorequirementrepo=ngorequirementrepo;
 	}
 	
 	//to get the authenticateduser from jwtitself(stored in memory) used so that a user cant impersonate as an another person
@@ -72,7 +76,21 @@ public class Donationservice {
 			return "success";
 		}
 		
-		Users recepient = userrepo.findById(data.getRecepientid()).orElse(null);
+		Users recepient = null;
+		Requirements targetRequirement = null;
+		
+		if (data.getRequirementid() != null) {
+			// Fulfilling a specific NGO requirement
+			targetRequirement = ngorequirementrepo.findById(data.getRequirementid()).orElse(null);
+			if (targetRequirement == null) {
+				return "Error: requirement not found";
+			}
+			recepient = targetRequirement.getUser();
+		} else {
+			// Direct donation to NGO without specific requirement
+			recepient = userrepo.findById(data.getRecepientid()).orElse(null);
+		}
+		
 		if(donor==null)
 			return "Error:you are not logged in properly";
 		if(recepient==null)
@@ -90,6 +108,11 @@ public class Donationservice {
 		donation.setImagedata(imagefile.getBytes());
 		donation.setDonor(donor);
 		donation.setRecipient(recepient);
+		
+		if (targetRequirement != null) {
+			donation.setRequirement(targetRequirement);
+			donation.setQuantityProvided(data.getQuantityProvided());
+		}
 		
 		
 		Donations savedDonation = donrepo.save(donation);
@@ -152,10 +175,49 @@ public class Donationservice {
 		}
 		
 		try {
+			String oldStatus = dono.getStatus();
+			// Prevent double-processing
+			if (oldStatus != null && oldStatus.equalsIgnoreCase(status)) {
+				return "success";
+			}
+
 			donrepo.updatestatus(id,status);
 			
 			if ("accepted".equalsIgnoreCase(status)) {
 				logisticsrepo.updateDeliveryStatusByDonationId(id, "ACCEPTED");
+				
+				// Handle Requirement fulfillment (adding quantity)
+				if (dono.getRequirement() != null) {
+					Requirements req = dono.getRequirement();
+					int currentFulfilled = req.getFulfilledQuantity() != null ? req.getFulfilledQuantity() : 0;
+					int provided = dono.getQuantityProvided() != null ? dono.getQuantityProvided() : 0;
+					
+					req.setFulfilledQuantity(currentFulfilled + provided);
+					
+					if (req.getFulfilledQuantity() >= req.getQuantity()) {
+						req.setIsActive(false);
+					}
+					
+					ngorequirementrepo.save(req);
+				}
+			} else if ("rejected".equalsIgnoreCase(status) || "cancelled".equalsIgnoreCase(status)) {
+				// Revert Requirement fulfillment if it was previously accepted
+				if ("accepted".equalsIgnoreCase(oldStatus) && dono.getRequirement() != null) {
+					Requirements req = dono.getRequirement();
+					int currentFulfilled = req.getFulfilledQuantity() != null ? req.getFulfilledQuantity() : 0;
+					int provided = dono.getQuantityProvided() != null ? dono.getQuantityProvided() : 0;
+					
+					int newFulfilled = currentFulfilled - provided;
+					if (newFulfilled < 0) newFulfilled = 0;
+					
+					req.setFulfilledQuantity(newFulfilled);
+					
+					if (req.getFulfilledQuantity() < req.getQuantity()) {
+						req.setIsActive(true);
+					}
+					
+					ngorequirementrepo.save(req);
+				}
 			}
 			
 			return "success";
@@ -188,6 +250,10 @@ public class Donationservice {
 		donrepo.claimitem(id,rid);
 		logisticsrepo.updateDeliveryStatusByDonationId(id, "ACCEPTED");
 		return "donation claiming has been done";
+	}
+
+	public List<Users> showverifiedngos(String string) {
+		return userrepo.findByRole(string);
 	}
 
 	

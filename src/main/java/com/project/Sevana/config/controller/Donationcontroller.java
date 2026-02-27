@@ -37,6 +37,12 @@ public class Donationcontroller {
 		return service.showallngos("NGO","NV_NGO");
 	}
 	
+	@GetMapping("/verngos")
+	@PreAuthorize("hasAnyAuthority('ADMIN')")
+	public List<Users> showaverifiedngos(){
+		return service.showverifiedngos("NGO");
+	}
+	
 	@GetMapping("/ngos")
 	@PreAuthorize("hasAnyAuthority('ADMIN','DONOR')")
 	public ResponseEntity<Map<String,Object>> showngos(@RequestParam(required = false) String keyword,
