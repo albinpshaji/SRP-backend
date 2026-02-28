@@ -64,4 +64,32 @@ public class Ngorequirementservice{
 		requirement.setCreatedAt(java.time.LocalDateTime.now());
 		return repo.save(requirement);
 	}
+	
+	@Transactional
+	public String deleteRequirement(Long reqId) {
+		Users user = getAuthenticatedUser();
+		Requirements req = repo.findById(reqId).orElse(null);
+		
+		if (req == null) {
+			return "Error: Requirement not found";
+		}
+		
+		if (!req.getUser().getUserid().equals(user.getUserid())) {
+			return "Error: Unauthorized to delete this requirement";
+		}
+		
+		int fulfilled = req.getFulfilledQuantity() != null ? req.getFulfilledQuantity() : 0;
+		
+		if (fulfilled > 0) {
+			// Soft-delete / Deactivate
+			req.setQuantity(fulfilled);
+			req.setIsActive(false);
+			repo.save(req);
+			return "Requirement quantity adjusted to match fulfilled amount and deactivated.";
+		} else {
+			// Hard-delete since no donations exist (or are accepted)
+			repo.delete(req);
+			return "Requirement deleted successfully.";
+		}
+	}
 }

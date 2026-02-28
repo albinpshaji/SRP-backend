@@ -18,9 +18,9 @@ RUN ./mvnw clean package -DskipTests
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-#Copy ONLY the finished JAR from the build stage
+#Coping ONLY the finished JAR from the build stage
 COPY --from=build /app/target/sevana.jar app.jar
 
-#Security and Execution
+#Execution
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

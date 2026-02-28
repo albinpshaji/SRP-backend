@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -121,6 +122,21 @@ public class Donationcontroller {
 	public ResponseEntity<String> claimItem(@PathVariable Long donid){
 		String sta = service.claimItem(donid);
 		return ResponseEntity.ok("item claimed successfully");
+	}
+	
+	@DeleteMapping("/mydonations/{donid}")
+	@PreAuthorize("hasAuthority('DONOR')")
+	public ResponseEntity<String> deletedonation(@PathVariable Long donid) {
+		try {
+			String response = service.deletedonation(donid);
+			if ("success".equals(response)) {
+				return ResponseEntity.ok("Donation deleted successfully");
+			} else {
+				return ResponseEntity.badRequest().body(response);
+			}
+		} catch (Exception e) {
+			return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+		}
 	}
 	
 }
