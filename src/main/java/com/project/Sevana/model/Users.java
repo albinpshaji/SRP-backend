@@ -20,6 +20,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import org.locationtech.jts.geom.Point;
+
 @Entity
 @Data
 @NoArgsConstructor 
@@ -54,6 +56,26 @@ public class Users {
 	private String phone;
 	
 	private String location;
+	
+	@Column(columnDefinition = "geometry(Point, 4326)")
+	@JsonIgnore
+	private Point locationPoint;
+	
+	@JsonProperty("latitude")
+	public Double getLatitude() {
+	    if (this.locationPoint != null) {
+	        return this.locationPoint.getY();
+	    }
+	    return null;
+	}
+	
+	@JsonProperty("longitude")
+	public Double getLongitude() {
+	    if (this.locationPoint != null) {
+	        return this.locationPoint.getX();
+	    }
+	    return null;
+	}
 	
 	private String isverified="PENDING";
 	

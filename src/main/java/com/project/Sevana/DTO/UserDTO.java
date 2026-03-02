@@ -12,4 +12,6 @@ public class UserDTO {//used in admincontroller.java
 	private String isverified;
 	private String licenceno;
 	private String website;
+	private Double latitude;
+	private Double longitude;
 }

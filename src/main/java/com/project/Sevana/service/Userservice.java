@@ -12,6 +12,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 
 import com.project.Sevana.DTO.UserDTO;
 import com.project.Sevana.model.Ngos;
@@ -53,6 +56,13 @@ public class Userservice {
 			userdata.setProfileimagedata(profilepic.getBytes());
 			userdata.setProfileimagename(profilepic.getOriginalFilename());
 			userdata.setProfileimagetype(profilepic.getContentType());
+		}
+		
+		if (user.getLatitude() != null && user.getLongitude() != null) {
+		    GeometryFactory geometryFactory = new GeometryFactory();
+		    Point point = geometryFactory.createPoint(new Coordinate(user.getLongitude(), user.getLatitude()));
+		    point.setSRID(4326);
+		    userdata.setLocationPoint(point);
 		}
 		
 		
@@ -100,6 +110,8 @@ public class Userservice {
 		user.setUsername(data.getUsername());
 		user.setPhone(data.getPhone());
 		user.setLocation(data.getLocation());
+		user.setLatitude(data.getLatitude());
+		user.setLongitude(data.getLongitude());
 		
 		return user;
 	}
