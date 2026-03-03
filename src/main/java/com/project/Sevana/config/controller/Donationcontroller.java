@@ -48,9 +48,11 @@ public class Donationcontroller {
 	@PreAuthorize("hasAnyAuthority('ADMIN','DONOR')")
 	public ResponseEntity<Map<String,Object>> showngos(@RequestParam(required = false) String keyword,
 													   @RequestParam(defaultValue="0") Long lastid,
-													   @RequestParam(defaultValue="2") int size){
+													   @RequestParam(defaultValue="2") int size,
+													   @RequestParam(required = false) Double userLat,
+													   @RequestParam(required = false) Double userLon){
 		
-		Map<String,Object> response = service.showngos(keyword,lastid,size);
+		Map<String,Object> response = service.showngos(keyword,lastid,size,userLat,userLon);
 		return ResponseEntity.ok(response);
 	}
 	

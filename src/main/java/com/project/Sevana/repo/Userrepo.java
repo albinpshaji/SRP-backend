@@ -42,5 +42,23 @@ public interface Userrepo extends JpaRepository<Users,Long>{
 			""", nativeQuery = true)
 	List<Users> searchbyanything(@Param("keyword") String keyword,@Param("lastid")Long lastid,@Param("size") int size);
 	
+	@Query(value = """
+		    SELECT *, 
+		    (6371 * acos(
+		        cos(radians(:userLat)) * cos(radians(ST_Y(location_point))) * cos(radians(ST_X(location_point)) - radians(:userLon)) + 
+		        sin(radians(:userLat)) * sin(radians(ST_Y(location_point)))
+		    )) AS distance 
+		    FROM users 
+		    WHERE role = 'NGO' 
+		    AND (:keyword IS NULL OR lower(username) LIKE lower(concat('%', :keyword, '%')))
+		    ORDER BY distance ASC
+		    LIMIT :size OFFSET :offset
+		    """, nativeQuery = true)
+	List<Users> findNearbyNgos(@Param("keyword") String keyword, 
+		                       @Param("userLat") Double userLat, 
+		                       @Param("userLon") Double userLon, 
+		                       @Param("size") int size,
+		                       @Param("offset") int offset);
+	
 	
 }

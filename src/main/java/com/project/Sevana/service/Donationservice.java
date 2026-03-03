@@ -137,13 +137,25 @@ public class Donationservice {
 	}
 	
 	@Transactional(readOnly = true)// here there is a cursor pagination
-	public Map<String,Object> showngos(String keyword, Long lastid, int size) {
+	public Map<String,Object> showngos(String keyword, Long lastid, int size, Double userLat, Double userLon) {
 		Map<String,Object> res = new HashMap<>();
-		List<Users> ngos = userrepo.searchbyanything(keyword, lastid, size);
+		List<Users> ngos;
+		
+		if (userLat != null && userLon != null) {
+		    // For distance sorting, lastid isn't strictly an offset by id. We'll interpret it as a rough literal offset 
+		    int offset = lastid.intValue();
+		    ngos = userrepo.findNearbyNgos(keyword, userLat, userLon, size, offset);
+		} else {
+		    ngos = userrepo.searchbyanything(keyword, lastid, size);
+		}
 		
 		Long nextCursor = null;
 		if(!ngos.isEmpty()) {
-			nextCursor = ngos.get(ngos.size()-1).getUserid();
+		    if (userLat != null && userLon != null) {
+		        nextCursor = lastid + size; // when sorting by distance, increment page offset
+		    } else {
+			    nextCursor = ngos.get(ngos.size()-1).getUserid();
+		    }
 		}
 		
 		res.put("nextCursor", nextCursor);
