@@ -145,6 +145,19 @@ public class Donationservice {
 		    // For distance sorting, lastid isn't strictly an offset by id. We'll interpret it as a rough literal offset 
 		    int offset = lastid.intValue();
 		    ngos = userrepo.findNearbyNgos(keyword, userLat, userLon, size, offset);
+		    // Recalculate discrete distance metrics for formatted output
+		    for (Users ngo : ngos) {
+		        if (ngo.getLatitude() != null && ngo.getLongitude() != null) {
+		            double R = 6371; // Radius of the earth in km
+		            double dLat = Math.toRadians(ngo.getLatitude() - userLat);
+		            double dLon = Math.toRadians(ngo.getLongitude() - userLon);
+		            double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + 
+		                       Math.cos(Math.toRadians(userLat)) * Math.cos(Math.toRadians(ngo.getLatitude())) * 
+		                       Math.sin(dLon / 2) * Math.sin(dLon / 2);
+		            double distanceResult = R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+		            ngo.setDistance(distanceResult);
+		        }
+		    }
 		} else {
 		    ngos = userrepo.searchbyanything(keyword, lastid, size);
 		}

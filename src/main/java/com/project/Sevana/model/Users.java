@@ -46,16 +46,21 @@ public class Users {
 	private String username;
 	
 	@JsonProperty(access=JsonProperty.Access.WRITE_ONLY)//so that password is not send to frontend
-	@Column(nullable = false)
+	@Column(nullable = true)
 	private String password;
 	
 	@Column(nullable=false)
 	private String role;
 	
-	@Column(nullable=false)
+	@Column(nullable=true)
 	private String phone;
 	
 	private String location;
+	
+	@Column(unique = true)
+	private String email;
+	
+	private String authProvider;
 	
 	@Column(columnDefinition = "geometry(Point, 4326)")
 	@JsonIgnore
@@ -73,6 +78,18 @@ public class Users {
 	public Double getLongitude() {
 	    if (this.locationPoint != null) {
 	        return this.locationPoint.getX();
+	    }
+	    return null;
+	}
+	
+	@jakarta.persistence.Transient
+	@JsonIgnore
+	private Double distance;
+	
+	@JsonProperty("distanceFormatted")
+	public String getDistanceFormatted() {
+	    if (this.distance != null) {
+	        return String.format("%.1f km away", this.distance);
 	    }
 	    return null;
 	}

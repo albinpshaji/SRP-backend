@@ -60,5 +60,6 @@ public interface Userrepo extends JpaRepository<Users,Long>{
 		                       @Param("size") int size,
 		                       @Param("offset") int offset);
 	
-	
+		Users findByEmail(String email);
+
 }
