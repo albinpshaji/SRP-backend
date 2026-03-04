@@ -60,5 +60,5 @@ public interface Userrepo extends JpaRepository<Users,Long>{
 		                       @Param("size") int size,
 		                       @Param("offset") int offset);
 	
-	
-}
+	@Query("SELECT new com.project.Sevana.model.Users(u.userid, u.username, u.password, u.role, u.phone, u.location, u.isverified) FROM Users u WHERE u.email = :email")
+	Users findByEmail(@Param("email") String email);}

@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,6 +20,7 @@ import com.project.Sevana.model.Ngos;
 import com.project.Sevana.model.Users;
 import com.project.Sevana.repo.Ngosrepo;
 import com.project.Sevana.repo.Userrepo;
+import com.project.Sevana.service.GeocodingService;
 
 @Service
 public class Userservice {
@@ -29,13 +29,15 @@ public class Userservice {
 	private final AuthenticationManager authmag;
 	private final Jwtservice jwtservice;
 	private final Ngosrepo nrepo;
+	private final GeocodingService geocodingService;
 	
 	@Autowired
-	public Userservice(Userrepo repo,Ngosrepo nrepo,AuthenticationManager authmag,Jwtservice jwtservice) {
+	public Userservice(Userrepo repo,Ngosrepo nrepo,AuthenticationManager authmag,Jwtservice jwtservice,GeocodingService geocodingService) {
 		this.repo = repo;
 		this.authmag=authmag;
 		this.jwtservice=jwtservice;
 		this.nrepo = nrepo; 
+		this.geocodingService = geocodingService;
 	}
 	
 	public List<Users> getusers() {
@@ -63,6 +65,14 @@ public class Userservice {
 		    Point point = geometryFactory.createPoint(new Coordinate(user.getLongitude(), user.getLatitude()));
 		    point.setSRID(4326);
 		    userdata.setLocationPoint(point);
+		    
+		    // Server-side reverse geocoding if location name is missing
+		    if (userdata.getLocation() == null || userdata.getLocation().trim().isEmpty()) {
+		        String resolvedAddress = geocodingService.reverseGeocode(user.getLatitude(), user.getLongitude());
+		        if (resolvedAddress != null) {
+		            userdata.setLocation(resolvedAddress);
+		        }
+		    }
 		}
 		
 		
@@ -116,6 +126,91 @@ public class Userservice {
 		return user;
 	}
 
-	
+	public com.project.Sevana.DTO.LoginresponseDTO completeProfile(UserDTO user, MultipartFile proof, MultipartFile profilepic, jakarta.servlet.http.HttpServletRequest request) throws IOException {
+		// Extract username from the JWT token in the request
+		String authHeader = request.getHeader("Authorization");
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			throw new RuntimeException("Missing or invalid authorization");
+		}
+		String token = authHeader.substring(7);
+		String username = jwtservice.extractusername(token);
+		
+		Users existingUser = repo.findByUsername(username);
+		if (existingUser == null || !"INCOMPLETE".equals(existingUser.getRole())) {
+			throw new RuntimeException("User not found or profile already completed");
+		}
+		
+		// Update username if provided (Google users choose their username here)
+		if (user.getUsername() != null && !user.getUsername().trim().isEmpty()) {
+			String newUsername = user.getUsername().trim();
+			// Check uniqueness (only if it's different from current)
+			if (!newUsername.equals(existingUser.getUsername())) {
+				Users existing = repo.findByUsername(newUsername);
+				if (existing != null) {
+					throw new RuntimeException("Username already taken");
+				}
+				// Preserve the email before changing username (for Google users, username was the email)
+				if (existingUser.getEmail() == null && existingUser.getUsername().contains("@")) {
+					existingUser.setEmail(existingUser.getUsername());
+					existingUser.setAuthProvider("GOOGLE");
+				}
+				existingUser.setUsername(newUsername);
+			}
+		}
+		
+		
+		existingUser.setPhone(user.getPhone());
+		existingUser.setLocation(user.getLocation());
+		
+		
+		if (user.getLatitude() != null && user.getLongitude() != null) {
+			GeometryFactory geometryFactory = new GeometryFactory();
+			Point point = geometryFactory.createPoint(new Coordinate(user.getLongitude(), user.getLatitude()));
+			point.setSRID(4326);
+			existingUser.setLocationPoint(point);
+			
+			// Server-side reverse geocoding if location name is missing
+			if (existingUser.getLocation() == null || existingUser.getLocation().trim().isEmpty()) {
+				String resolvedAddress = geocodingService.reverseGeocode(user.getLatitude(), user.getLongitude());
+				if (resolvedAddress != null) {
+					existingUser.setLocation(resolvedAddress);
+				}
+			}
+		}
+		
+		// Set profile picture
+		if (profilepic != null && !profilepic.isEmpty()) {
+			existingUser.setProfileimagedata(profilepic.getBytes());
+			existingUser.setProfileimagename(profilepic.getOriginalFilename());
+			existingUser.setProfileimagetype(profilepic.getContentType());
+		}
+		
+		// Handle role-specific logic
+		if ("NGO".equals(user.getRole())) {
+			existingUser.setRole("NV_NGO"); // Not verified NGO
+			if (proof != null && !proof.isEmpty()) {
+				Ngos ngo = new Ngos();
+				ngo.setLicenceno(user.getLicenceno());
+				ngo.setWebsite(user.getWebsite());
+				ngo.setProofimagename(proof.getOriginalFilename());
+				ngo.setProofimagetype(proof.getContentType());
+				ngo.setProofimagedata(proof.getBytes());
+				Users savedUser = repo.save(existingUser);
+				ngo.setUser(savedUser);
+				nrepo.save(ngo);
+				
+				String newToken = jwtservice.generatetoken(savedUser.getUsername());
+				return new com.project.Sevana.DTO.LoginresponseDTO(newToken, savedUser.getRole(), savedUser.getUserid());
+			}
+			throw new RuntimeException("NGO proof document is required");
+		} else {
+			// DONOR or any other role
+			existingUser.setRole("DONOR");
+			Users savedUser = repo.save(existingUser);
+			
+			String newToken = jwtservice.generatetoken(savedUser.getUsername());
+			return new com.project.Sevana.DTO.LoginresponseDTO(newToken, savedUser.getRole(), savedUser.getUserid());
+		}
+	}
 
 }
