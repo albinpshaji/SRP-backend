@@ -140,11 +140,29 @@ public class Userservice {
 			throw new RuntimeException("User not found or profile already completed");
 		}
 		
-		// Update common fields
+		// Update username if provided (Google users choose their username here)
+		if (user.getUsername() != null && !user.getUsername().trim().isEmpty()) {
+			String newUsername = user.getUsername().trim();
+			// Check uniqueness (only if it's different from current)
+			if (!newUsername.equals(existingUser.getUsername())) {
+				Users existing = repo.findByUsername(newUsername);
+				if (existing != null) {
+					throw new RuntimeException("Username already taken");
+				}
+				// Preserve the email before changing username (for Google users, username was the email)
+				if (existingUser.getEmail() == null && existingUser.getUsername().contains("@")) {
+					existingUser.setEmail(existingUser.getUsername());
+					existingUser.setAuthProvider("GOOGLE");
+				}
+				existingUser.setUsername(newUsername);
+			}
+		}
+		
+		
 		existingUser.setPhone(user.getPhone());
 		existingUser.setLocation(user.getLocation());
 		
-		// Set location point if coordinates provided
+		
 		if (user.getLatitude() != null && user.getLongitude() != null) {
 			GeometryFactory geometryFactory = new GeometryFactory();
 			Point point = geometryFactory.createPoint(new Coordinate(user.getLongitude(), user.getLatitude()));
