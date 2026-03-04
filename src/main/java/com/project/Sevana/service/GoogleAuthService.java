@@ -73,6 +73,8 @@ public class GoogleAuthService {
             newUser.setUsername(email); // Use email as username (unique)
             newUser.setEmail(email);
             newUser.setPassword(encoder.encode(UUID.randomUUID().toString())); // Random unguessable password
+            newUser.setPhone("");
+            newUser.setLocation("");
             newUser.setRole("INCOMPLETE");
             newUser.setAuthProvider("GOOGLE");
             newUser.setIsverified("PENDING");
